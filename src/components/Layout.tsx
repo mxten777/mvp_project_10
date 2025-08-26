@@ -25,6 +25,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   ];
   const bannerMsg = bannerMessages[new Date().getDate() % bannerMessages.length];
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
       {/* 앱 내 공지/팁/가이드 배너 */}
@@ -43,14 +45,54 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       )}
     {/* 상단 고정 헤더 (모바일) */}
   <header className="fixed top-0 left-0 right-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow md:hidden flex items-center justify-between h-14 px-4" style={{ top: showBanner ? '32px' : 0 }}>
-        <button className="p-2 rounded-lg hover:bg-gray-100 focus:outline-none" aria-label="메뉴">
+        <button
+          className="p-2 rounded-lg hover:bg-gray-100 focus:outline-none"
+          aria-label="메뉴"
+          onClick={() => setMenuOpen(true)}
+        >
           <span className="text-2xl">☰</span>
         </button>
-  <span className="font-bold text-base text-gray-900 dark:text-white">약 챙겨</span>
+        <span className="font-bold text-base text-gray-900 dark:text-white">약 챙겨</span>
         <button className="p-2 rounded-lg hover:bg-gray-100 focus:outline-none" aria-label="알림">
           <span className="text-xl">🔔</span>
         </button>
       </header>
+
+      {/* 모바일 사이드 드로어 메뉴 */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/30"
+          onClick={() => setMenuOpen(false)}
+        >
+          <nav
+            className="absolute top-0 left-0 mt-3 ml-2 bg-white dark:bg-gray-900 shadow-lg rounded-xl flex flex-col min-w-[180px] max-w-[220px] min-h-0 px-3 py-3"
+            onClick={e => e.stopPropagation()}
+            aria-label="사이드 메뉴"
+          >
+            <button
+              className="mb-2 ml-1 text-lg p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none self-start"
+              aria-label="메뉴 닫기"
+              onClick={() => setMenuOpen(false)}
+            >
+              ✕
+            </button>
+            <ul className="w-full flex flex-col gap-0.5">
+              {navItems.map(item => (
+                <li key={item.to} className="w-full">
+                  <Link
+                    to={item.to}
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded text-[15px] transition-colors w-full ${location.pathname === item.to ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 font-bold' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span className="text-lg flex-shrink-0">{item.icon}</span>
+                    <span className="truncate">{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      )}
     {/* 메인 컨텐츠 (상단 헤더+배너 높이만큼 패딩) */}
   <main className={`flex-1 pb-16 px-2 sm:px-4 max-w-md mx-auto w-full ${showBanner ? 'pt-[88px]' : 'pt-16'}`}>
         {children}
